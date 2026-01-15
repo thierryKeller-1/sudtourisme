@@ -1,0 +1,73 @@
+{
+    "base_url": "https://www.sudtourisme.nc/trouvez-votre-bonheur/tous-les-hebergements/",
+    "accomodation_filter": {
+        "by_tag_only": false,
+        "tag": "div",
+        "attr_key": "id",
+        "attr_value": "api_filter"
+    },
+    "hotel_filter": {
+        "by_tag_only": false,
+        "tag": "input",
+        "attr_key": "data-translation",
+        "attr_value": "Hôtel"
+    },
+    "gite_filter": {
+        "by_tag_only": false,
+        "tag": "input",
+        "attr_key": "data-translation",
+        "attr_value": "Meublé et Gîte"
+    },
+    "pagination": {
+        "by_tag_only": false,
+        "tag": "ul",
+        "attr_key": "class",
+        "attr_value": "pagination playlist-pager"
+    },
+    "pages": {
+        "by_tag_only": false,
+        "tag": "li",
+        "attr_key": "class",
+        "attr_value": "page-item",
+        "target": "child"
+    },
+    "page": {
+        "by_tag_only": false,
+        "tag": "a",
+        "target": "attribute",
+        "value_attr": "data-page"
+    },
+    "next_page_button": {
+        "by_tag_only": false,
+        "tag": "a",
+        "attr_key": "data-page",
+        "attr_value": "+"
+    },
+    "data_extraction": {
+        "container": {
+            "by_tag_only": false,
+            "tag": "div",
+            "attr_key": "id",
+            "attr_value": "item_sheet_list"
+        },
+        "datas": {
+            "by_tag_only": true,
+            "tag": "article"
+        },
+        "data":{
+            "url": {
+                "by_tag_only": false,
+                "tag": "a",
+                "target": "attribute",
+                "value_attr": "href"
+            },
+            "name": {
+                "by_tag_only": false,
+                "tag": "div",
+                "attr_key":"class",
+                "attr_value": "item-infos-title h3",
+                "target": "text"
+            }
+        }
+    }
+}
