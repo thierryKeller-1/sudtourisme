@@ -91,7 +91,7 @@ def run_scraping(metadata:dict) -> None:
     time.sleep(5)
     
     actions.accept_cookies(driver)
-    # actions.set_currency_to_eur(driver)
+    actions.set_currency_to_eur(driver)
     actions.set_dates(driver, metadata.get('date_debut'), metadata.get('date_end'))
 
     if is_date_valid(driver, metadata):
