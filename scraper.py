@@ -19,6 +19,7 @@ class ScrapPageExtractor:
         self.selectors = metadata.get('selectors', {})
         self.data = []
         self.metadata = metadata
+        print(metadata)
 
     def clean_text(self, text:str) -> str:
         return text.replace(',', ' - ')
@@ -33,7 +34,7 @@ class ScrapPageExtractor:
         localite = self.clean_text(self.driver.get_text("a[id='_d6fvjqzs.yz76ch5j.za4ds10u.ifutabet.dy8sg6w9']"))
 
         soupe = soupify(self.driver.page_html)
-        cards = soupe.find("div", {'id':'_jrwmov0d.r0rmbvhs'}).find_all('li', {'class':"flex flex-col h-full justify-between p-4 rounded-md border-2 border-gray-600 hover:bg-gray-200 cursor-pointer"})
+        cards = soupe.find("ul", {'class':'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-auto'}).find_all('li', {'class':"flex flex-col h-full justify-between p-4 rounded-md border-2 border-gray-600 hover:bg-gray-200 cursor-pointer"})
         for card in cards:
             data = {}
             data['web-scraper-order'] = ''
@@ -57,17 +58,20 @@ def is_date_valid(driver: Driver, metadata:dict) -> bool:
     print("validating dates...")
     soupe = soupify(driver.page_html)
     try:
-        cards = soupe.find("div", {'id':'_jrwmov0d.r0rmbvhs'}).find_all('li', {'class':"flex flex-col h-full justify-between p-4 rounded-md border-2 border-gray-600 hover:bg-gray-200 cursor-pointer"})
+        cards = soupe.find("ul", {'class':'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-auto'}).find_all('li', {'class':"flex flex-col h-full justify-between p-4 rounded-md border-2 border-gray-600 hover:bg-gray-200 cursor-pointer"})
         if cards:
             first_card = cards[0]
             date_text = first_card.find('p', {'class':'font-semibold'}).text.strip().replace('Du ', '').split(' au ')
+            print(date_text)
             print(f"Expected dates: {metadata.get('date_debut')}: {date_text[0]} | {metadata.get('date_end')}: {date_text[1]}")
             meta_date_start = metadata.get('date_debut').split('-')[::-1]
             meta_date_end = metadata.get('date_end').split('-')[::-1]
+            print(date_text[0] == "/".join(meta_date_start), f"{date_text[0]}: {"/".join(meta_date_start)}")
+            print(date_text[1] == "/".join(meta_date_end), f"{date_text[1]}: {"/".join(meta_date_end)}")
             if date_text[0] == "/".join(meta_date_start) and date_text[1] == "/".join(meta_date_end):
                 print("Dates are valid.")
                 return True
-        print("Dates are not valid.")
+            print("Dates are not valid.")
         return False
     except Exception as e:
         print(f"cards not found or dates invalid: {e}")
@@ -77,10 +81,10 @@ def run_scraping(metadata:dict) -> None:
     print(f"url ==> {metadata.get('current_dest')} ")
     driver = Driver(block_images=True, wait_for_complete_page_load=True)
     base_url = metadata.get("current_dest").split("?")[0]
-    metadata['date_debut'] = parse_qs(urlparse(metadata.get('current_dest')).query).get('checkin')[0]
-    metadata['date_end'] = parse_qs(urlparse(metadata.get('current_dest')).query).get('checkout')[0]
+    date_debut = parse_qs(urlparse(metadata.get('current_dest')).query).get('checkin')[0]
+    date_end = parse_qs(urlparse(metadata.get('current_dest')).query).get('checkout')[0]
     driver.get(base_url)
-    #check page if not 404
+
     try:
         if driver.select("h1[class='text-6xl font-bold text-gray-900 mb-4']").text == "404":
             print(f"Error 404 for url {base_url}")
@@ -91,8 +95,10 @@ def run_scraping(metadata:dict) -> None:
     time.sleep(5)
     
     actions.accept_cookies(driver)
-    # actions.set_currency_to_eur(driver)
-    actions.set_dates(driver, metadata.get('date_debut'), metadata.get('date_end'))
+    actions.set_currency_to_eur(driver)
+    actions.set_dates(driver, date_debut, date_end)
+    metadata.__setitem__('date_debut', date_debut)
+    metadata.__setitem__('date_end', date_end)
 
     if is_date_valid(driver, metadata):
         print("Dates correctly set.")
